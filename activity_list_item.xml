@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".list_item">
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/idnim"
+            android:layout_width="match_parent"
+            android:layout_height="18dp"
+            android:text="Nim"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="8dp" />
+
+        <TextView
+            android:id="@+id/idnama"
+            android:layout_width="match_parent"
+            android:layout_height="19dp"
+            android:text="Nama"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="26dp" />
+
+        <TextView
+            android:id="@+id/idjurusan"
+            android:layout_width="match_parent"
+            android:layout_height="19dp"
+            android:text="Jurusan"
+            tools:layout_editor_absoluteX="7dp"
+            tools:layout_editor_absoluteY="45dp" />
+
+        <TextView
+            android:id="@+id/idtmplahir"
+            android:layout_width="match_parent"
+            android:layout_height="19dp"
+            android:text="Tempat Lahir"
+            tools:layout_editor_absoluteX="7dp"
+            tools:layout_editor_absoluteY="64dp" />
+
+        <TextView
+            android:id="@+id/idtgllahir"
+            android:layout_width="match_parent"
+            android:layout_height="20dp"
+            android:text="Tanggal Lahir"
+            tools:layout_editor_absoluteX="7dp"
+            tools:layout_editor_absoluteY="83dp" />
+
+        <TextView
+            android:id="@+id/idalamat"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Alamat" />
+
+        <TextView
+            android:id="@+id/idagama"
+            android:layout_width="match_parent"
+            android:layout_height="22dp"
+            android:text="Agama"
+            tools:layout_editor_absoluteX="8dp"
+            tools:layout_editor_absoluteY="103dp" />
+
+    </LinearLayout>
+
+</android.support.constraint.ConstraintLayout>
