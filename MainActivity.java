@@ -1,110 +1,79 @@
 package com.example.siakad;
-
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.app.ProgressDialog;
-import android.os.AsyncTask;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
-import android.widget.ListAdapter;
-import android.widget.ListView;
-import android.widget.SimpleAdapter;
+import android.util.Log;
 import android.widget.Toast;
-
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.ArrayList;
 import java.util.HashMap;
-
 public class MainActivity extends AppCompatActivity {
-    private ListView listView;
-    private String JSON_STRING;
+    private RecyclerView lvmahasiswa;
+    private RequestQueue requestQueue;
+    private StringRequest stringRequest;
+    ArrayList<HashMap<String, String>> list_data;
+    String url = "http://172.16.0.96/siakad2/getdata.php";
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        listView=findViewById(R.id.listview);
-        getJSON();
-    }
-    private void tampildata(){
-        JSONObject jsonObject = null;
-        ArrayList<HashMap<String,String>> list = new ArrayList<HashMap<String, String>>();
-        try {
-            //jika program benar;
-            jsonObject = new JSONObject(JSON_STRING);
-            JSONArray result = jsonObject.getJSONArray(konfigurasi.TAG_JSON_ARRAY); //tabel mahasiswa
-            for(int i = 0; i<result.length(); i++){
-                JSONObject jo = result.getJSONObject(i);
-                String nim = jo.getString(konfigurasi.TAG_NIM);
-                String nama = jo.getString(konfigurasi.TAG_NAMA);
-                String jurusan = jo.getString(konfigurasi.TAG_JURUSAN);
-                String tempatlahir = jo.getString(konfigurasi.TAG_TEMPATLAHIR);
-                String tanggallahir = jo.getString(konfigurasi.TAG_TANGGALLAHIR);
-                String alamat = jo.getString(konfigurasi.TAG_ALAMAT);
-                String agama = jo.getString(konfigurasi.TAG_AGAMA);
+        lvmahasiswa = (RecyclerView) findViewById(R.id.lv_mahasiswa);
+        //merubah komponen RecyclerView menjadi linier vertical
+        LinearLayoutManager llm = new LinearLayoutManager(this);
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        lvmahasiswa.setLayoutManager(llm);
+        requestQueue = Volley.newRequestQueue(MainActivity.this);
 
-                HashMap<String,String> employees = new HashMap<>();
-                employees.put(konfigurasi.TAG_NIM,nim);
-                employees.put(konfigurasi.TAG_NAMA,nama);
-                employees.put(konfigurasi.TAG_JURUSAN,jurusan);
-                employees.put(konfigurasi.TAG_TEMPATLAHIR,tempatlahir);
-                employees.put(konfigurasi.TAG_TANGGALLAHIR,tanggallahir);
-                employees.put(konfigurasi.TAG_ALAMAT,alamat);
-                employees.put(konfigurasi.TAG_AGAMA,agama);
-                list.add(employees);
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-            //program salah
-            Toast.makeText(MainActivity.this,e.toString(),Toast.LENGTH_LONG).show();
-        }
-
-        ListAdapter adapter = new SimpleAdapter(
-                MainActivity.this, list, R.layout.activity_list_item,
-                new String[]{konfigurasi.TAG_NIM,
-                        konfigurasi.TAG_NAMA,
-                        konfigurasi.TAG_JURUSAN,
-                        konfigurasi.TAG_TEMPATLAHIR,
-                        konfigurasi.TAG_TANGGALLAHIR,
-                        konfigurasi.TAG_AGAMA},
-                new int[]{R.id.idnim,
-                        R.id.idnama,
-                        R.id.idjurusan,
-                        R.id.idtmplahir,
-                        R.id.idtgllahir,
-                        R.id.idalamat,
-                        R.id.idagama
-                });
-        listView.setAdapter(adapter);
-    }
-
-    private void getJSON(){
-        class GetJSON extends AsyncTask<Void,Void,String> {
-            ProgressDialog loading;
+        //set variabel list_data dengan nilai null (kosong)
+        list_data = new ArrayList<HashMap<String, String>>(); 
+        stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
             @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                loading = ProgressDialog.show(MainActivity.this,
-                        "Mengambil Data","Mohon Tunggu...",false,false);
-            }
-            @Override
-            protected void onPostExecute(String s) {
-                super.onPostExecute(s);
-                loading.dismiss();
-                JSON_STRING = s;
-                tampildata();
-            }
+            public void onResponse(String response) {
+                Log.d("response ", response);
+                try {
+                    //ketika program berhasil
+                    JSONObject jsonObject = new JSONObject(response);
+                    JSONArray jsonArray = jsonObject.getJSONArray("mahasiswa");
+                    //perulangan sebanyak jumlah data dalam varaibel mahasiswa
+                    for (int a = 0; a < jsonArray.length(); a++) {
+                        JSONObject json = jsonArray.getJSONObject(a);
+                        HashMap<String, String> map = new HashMap<String, String>();
+                        map.put("nim", json.getString("nim"));
+                        map.put("nama", json.getString("nama"));
+                        map.put("jurusan", json.getString("jurusan"));
+                        map.put("alamat", json.getString("alamat"));
+                        map.put("tmplahir", json.getString("tmplahir"));
+                        map.put("tgllahir", json.getString("tgllahir"));
+                        map.put("agama", json.getString("agama"));
+                        list_data.add(map);
+                        AdapterList adapter = new AdapterList(MainActivity.this, list_data);
+                        lvmahasiswa.setAdapter(adapter);
+                    }
+                } catch (JSONException e) {
 
-            @Override
-            protected String doInBackground(Void... params) {
-                RequestHandler rh = new RequestHandler();
-                String s = rh.sendGetRequest(konfigurasi.URL_GET_ALL);
-                return s;
+                    //ketika ada error
+                    e.printStackTrace();
+                }
             }
-        }
-        GetJSON gj = new GetJSON();
-        gj.execute();
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Toast.makeText(MainActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+        requestQueue.add(stringRequest);
+
+
     }
 }
